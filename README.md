@@ -1,58 +1,29 @@
-# ORM and migrations demo webinar code | Yandex Praktikum 
+# Basic logger for django models
 
-## Install required dependencies
-```shell
-pip install -r requirements.txt
+## HOW TO USE
+
+```
+from changelog.models import ChangeLogMixin, track_model_changes
+
+@track_model_changes
+class UserModel(models.Model):
+    pass
 ```
 
-## Краткий экскурс в проект. Что мы хотим спроектировать? (models_v1)
-- обзор Trello
-- обзор моделей
-
-## Что такое миграции? Зачем они нужны?
-- плюсы и минусы ORM
-- сравнение создания таблиц при помощи миграций и сырого SQL
-- сравнение вызова сырого SQL и вызова через ORM
-- миграции django по умолчанию
-- фиксированная директория
-- команды для создания и применения (+ указание приложения, указание имени миграции)
-- таблица django_migrations для хранения примененных миграций
-
-## Рефакторинг — замечаем несоблюдение DRY (models_v2)
-- миксины для моделей
-- [абстрактные модели](https://docs.djangoproject.com/en/3.2/topics/db/models/#abstract-base-classes)
-
-## Требование от заказчика — архивные задачи должны показываться только в админке и больше нигде (models_v3)
-- что такое менеджер модели?
-- [кастомные менеджеры моделей](https://docs.djangoproject.com/en/3.2/topics/db/managers)
-- переопределение методов админки
-
-## Рефакторинг — разделяем модели по модулям (models_v4)
-
-## Требование от заказчика — сохранять историю действий с задачей (models_v5)
-- переопределение метода save() - как устроено сохранение changelog
-
-## Требование от заказчика — хранить время в часах неудобно, нужно перевести на минуты
-- [кастомные миграции](https://docs.djangoproject.com/en/3.2/howto/writing-migrations/)
-- [копирование объектов модели](https://docs.djangoproject.com/en/3.2/topics/db/queries/#copying-model-instances)
-- [обновление объектов](https://docs.djangoproject.com/en/3.2/topics/db/queries/#copying-model-instances) - update_queryset.py
-
-## Рефакторинг — сжимаем миграции
-- ручное сжатие миграций
-```shell
-python manage.py migrate trello zero
-rm trello/migrations/*
-touch trello/migrations/__init__.py
+Then run:
+```
 python manage.py makemigrations
+```
+to create new migrations to make appropriate Log models (from marked by you).
+
+And finally sync migrations:
+```
 python manage.py migrate
 ```
-- [squashmigrations](https://docs.djangoproject.com/en/3.2/topics/migrations/#migration-squashing)
-```shell
-python manage.py squashmigrations trello <migration_name>
-```
 
-### Прочее
-- [Q](https://docs.djangoproject.com/en/3.2/topics/db/queries/#complex-lookups-with-q-objects)
-- [model methods](https://docs.djangoproject.com/en/3.2/topics/db/models/#model-methods)
-- get_absolute_url() 
-- through
+
+## HOW IT WORKS
+
+You should mark all necessary models with `track_model_changes` decorator. It saves all models, that will be prepared to track.
+
+Next you also have to add mixin: `ChangeLogMixin`. It adds some changes to `__save__` method of the model. when the model will be changed the method will be triggered and appropriate ChangeLog model will be updated with new row about this change.
