@@ -1,10 +1,12 @@
 from django.db import models
 
+from changelog.models import ChangeLogMixin, track_model_changes
 from trello.models.mixins import BaseModelMixin
 from trello.models.project import Project
 
 
-class Column(BaseModelMixin):
+@track_model_changes
+class Column(ChangeLogMixin, BaseModelMixin):
     title = models.CharField(max_length=255)
     position = models.PositiveIntegerField(default=0)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
